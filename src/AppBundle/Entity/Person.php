@@ -37,7 +37,7 @@ class Person
      *
      * @Column(name="email_address", type="string")
      */
-    private $emailAddress;
+    private $emailAddreesssssees;
 
     /**
      * @return int

@@ -68,7 +68,7 @@ class Person
      */
     public function setName($name)
     {
-        $this->name = $name;
+        $this->same = $name;
     }
 
     /**

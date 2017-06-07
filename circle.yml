@@ -1,0 +1,30 @@
+machine:
+  timezone: Europe/London
+  php:
+    version: 5.6.22
+
+dependencies:
+  cache_directories:
+    - "~/.cache/composer"
+  pre:
+    - echo "date.timezone = Europe/London" >> /opt/circleci/php/$(phpenv global)/etc/php.ini
+    - cp app/config/parameters.yml.circle app/config/parameters.yml
+
+database:
+  override:
+    - mysql -u root -e "CREATE DATABASE testdb;"
+    - app/console doctrine:schema:create --env=test
+
+compile:
+  override:
+    - bin/parallel-lint src
+    - app/console lint:twig app
+    - app/console lint:yaml app
+    - bin/var-dump-check --ladybug --no-colors src
+    - bin/php-cs-fixer fix --dry-run src
+
+test:
+  pre:
+    - mkdir -p $CIRCLE_TEST_REPORTS/phpunit
+  override:
+    - bin/phpunit -c app/phpunit.xml.dist --log-junit $CIRCLE_TEST_REPORTS/phpunit/junit.xml -d memory_limit=512M
